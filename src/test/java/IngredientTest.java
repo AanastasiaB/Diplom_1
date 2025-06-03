@@ -18,7 +18,7 @@ public class IngredientTest {
         this.price = price;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Ingredient: type={0}, name={1}, price={2}")
     public static Object[][] getData() {
         return new Object[][] {
                 {IngredientType.SAUCE, "hot sauce", 100},
@@ -33,18 +33,18 @@ public class IngredientTest {
     @Test
     public void testGetPrice() {
         Ingredient ingredient = new Ingredient(type, name, price);
-        assertEquals(price, ingredient.getPrice(), 0);
+        assertEquals("Ingredient price should match constructor parameter", price, ingredient.getPrice(), 0);
     }
 
     @Test
     public void testGetName() {
         Ingredient ingredient = new Ingredient(type, name, price);
-        assertEquals(name, ingredient.getName());
+        assertEquals("Ingredient name should match constructor parameter", name, ingredient.getName());
     }
 
     @Test
     public void testGetType() {
         Ingredient ingredient = new Ingredient(type, name, price);
-        assertEquals(type, ingredient.getType());
+        assertEquals("Ingredient type should match constructor parameter", type, ingredient.getType());
     }
 }

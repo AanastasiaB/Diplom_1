@@ -41,7 +41,7 @@ public class BurgerTest {
         this.ingredientPrice2 = ingredientPrice2;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Burger: bun={0} ({1}), ingredients={2}/{3} ({4}) + {5}/{6} ({7})")
     public static Object[][] getData() {
         return new Object[][] {
                 {"black bun", 100, IngredientType.SAUCE, "hot sauce", 100, IngredientType.FILLING, "cutlet", 100},
@@ -53,7 +53,6 @@ public class BurgerTest {
     @Before
     public void setUp() {
         burger = new Burger();
-
         bun = mock(Bun.class);
         when(bun.getName()).thenReturn(bunName);
         when(bun.getPrice()).thenReturn(bunPrice);
@@ -72,32 +71,51 @@ public class BurgerTest {
     @Test
     public void testSetBuns() {
         burger.setBuns(bun);
-        assertEquals(bun, burger.bun);
+        assertEquals("Burger bun should be set correctly", bun, burger.bun);
     }
 
     @Test
-    public void testAddIngredient() {
+    public void testAddIngredientIncreasesSize() {
         burger.addIngredient(ingredient1);
-        assertEquals(1, burger.ingredients.size());
-        assertEquals(ingredient1, burger.ingredients.get(0));
+        assertEquals("Ingredients list size should be 1 after adding one ingredient", 1, burger.ingredients.size());
     }
 
     @Test
-    public void testRemoveIngredient() {
+    public void testAddIngredientAddsCorrectIngredient() {
+        burger.addIngredient(ingredient1);
+        assertEquals("First ingredient should match added ingredient", ingredient1, burger.ingredients.get(0));
+    }
+
+    @Test
+    public void testRemoveIngredientDecreasesSize() {
         burger.addIngredient(ingredient1);
         burger.addIngredient(ingredient2);
         burger.removeIngredient(0);
-        assertEquals(1, burger.ingredients.size());
-        assertEquals(ingredient2, burger.ingredients.get(0));
+        assertEquals("Ingredients list size should be 1 after removal", 1, burger.ingredients.size());
     }
 
     @Test
-    public void testMoveIngredient() {
+    public void testRemoveIngredientKeepsCorrectIngredient() {
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
+        burger.removeIngredient(0);
+        assertEquals("Remaining ingredient should be the second one added", ingredient2, burger.ingredients.get(0));
+    }
+
+    @Test
+    public void testMoveIngredientChangesFirstPosition() {
         burger.addIngredient(ingredient1);
         burger.addIngredient(ingredient2);
         burger.moveIngredient(0, 1);
-        assertEquals(ingredient2, burger.ingredients.get(0));
-        assertEquals(ingredient1, burger.ingredients.get(1));
+        assertEquals("First ingredient after move should be the original second", ingredient2, burger.ingredients.get(0));
+    }
+
+    @Test
+    public void testMoveIngredientChangesSecondPosition() {
+        burger.addIngredient(ingredient1);
+        burger.addIngredient(ingredient2);
+        burger.moveIngredient(0, 1);
+        assertEquals("Second ingredient after move should be the original first", ingredient1, burger.ingredients.get(1));
     }
 
     @Test
@@ -107,23 +125,40 @@ public class BurgerTest {
         burger.addIngredient(ingredient2);
 
         float expectedPrice = bunPrice * 2 + ingredientPrice1 + ingredientPrice2;
-        assertEquals(expectedPrice, burger.getPrice(), 0);
+        assertEquals("Burger price should be sum of bun price x2 plus ingredients prices", expectedPrice, burger.getPrice(), 0);
     }
 
     @Test
-    public void testGetReceipt() {
+    public void testGetReceiptContainsBunName() {
         burger.setBuns(bun);
         burger.addIngredient(ingredient1);
-        burger.addIngredient(ingredient2);
-
         String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain bun name: " + bunName, receipt.contains(bunName));
+    }
 
-        assertTrue(receipt.contains(bunName));
-        assertTrue(receipt.contains(ingredientType1.toString().toLowerCase()));
-        assertTrue(receipt.contains(ingredientName1));
-        assertTrue(receipt.contains(ingredientType2.toString().toLowerCase()));
-        assertTrue(receipt.contains(ingredientName2));
-        String expectedPriceString = String.format("%.6f", burger.getPrice()).replaceAll("0*$", "").replaceAll("\\.$", "");
+    @Test
+    public void testGetReceiptContainsIngredientType() {
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient1);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain ingredient type: " + ingredientType1, receipt.contains(ingredientType1.toString().toLowerCase()));
+    }
+
+    @Test
+    public void testGetReceiptContainsIngredientName() {
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient1);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain ingredient name: " + ingredientName1, receipt.contains(ingredientName1));
+    }
+
+    @Test
+    public void testGetReceiptContainsPrice() {
+        burger.setBuns(bun);
+        burger.addIngredient(ingredient1);
+        String expectedPriceString = String.format("%.6f", burger.getPrice())
+                .replaceAll("0*$", "").replaceAll("\\.$", "");
+        String receipt = burger.getReceipt();
         assertTrue("Receipt should contain price: " + expectedPriceString, receipt.contains(expectedPriceString));
     }
 
@@ -139,3 +174,4 @@ public class BurgerTest {
         burger.getReceipt();
     }
 }
+

@@ -15,7 +15,7 @@ public class BunTest {
         this.price = price;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Bun: name={0}, price={1}")
     public static Object[][] getData() {
         return new Object[][] {
                 {"black bun", 100},
@@ -29,12 +29,12 @@ public class BunTest {
     @Test
     public void testGetName() {
         Bun bun = new Bun(name, price);
-        assertEquals(name, bun.getName());
+        assertEquals("Bun name should match constructor parameter", name, bun.getName());
     }
 
     @Test
     public void testGetPrice() {
         Bun bun = new Bun(name, price);
-        assertEquals(price, bun.getPrice(), 0);
+        assertEquals("Bun price should match constructor parameter", price, bun.getPrice(), 0);
     }
 }
